@@ -7,7 +7,7 @@
         public DateTime ShiftStartTime { get; set; }
         public DateTime ShiftEndTime { get; set; }  
         public double ShiftDuration { get; set; }
-        public DateTime ShiftDate { get; set; }
+        public DateTime? ShiftDate { get; set; }
         public Worker Worker { get; set; }
         public void CalculateDuration()
         {

@@ -39,9 +39,15 @@ namespace ShiftLogger.Study.Controllers
         [HttpPost]
         public async Task<ActionResult<ResponseDto<Shift>>> GetShiftByIdAsync([FromBody]ShiftDto shift)
         {
-            var NewShift=repository.CreateShift(shift);
-
-            return CreatedAtAction(nameof(GetShiftByIdAsync), new { Id = NewShift.Id }, NewShift);
+            var NewShift=await repository.CreateShift(shift);
+            return CreatedAtAction(nameof(GetShiftByIdAsync), new { Id = NewShift.ShiftId }, NewShift);
+        }
+        [HttpPut]
+        [Route("{Id:int}")]
+        public async Task<ActionResult<ResponseDto<Shift>>> UpdateShiftAsync([FromBody] ShiftDto shift, [FromRoute] int Id)
+        {
+            Shift UpdatedShift = await repository.UpdateShiftAsync(shift, Id);
+            return Ok(ResponseDto<Shift>.Success(UpdatedShift,"Succefully Updated"));
         }
     }
 }

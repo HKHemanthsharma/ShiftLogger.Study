@@ -43,5 +43,33 @@ namespace ShiftLogger.Study
             base.SaveChanges();
             return Entities.Count();
         }
+            public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            // Get all Shift entities that are added, modified, or deleted
+            var shiftEntries = ChangeTracker.Entries<Shift>()
+                .Where(x => x.State == EntityState.Added ||
+                           x.State == EntityState.Modified ||
+                           x.State == EntityState.Deleted)
+                .ToList();
+
+            // Process each entity
+            foreach (var entry in shiftEntries)
+            {
+                // Skip deleted entities if you only want to process added/modified
+                if (entry.State == EntityState.Deleted)
+                    continue;
+
+                var shift = entry.Entity;
+
+                // Calculate duration
+                shift.CalculateDuration();
+
+                // Set default date if null
+                shift.ShiftDate ??= DateTime.Now.Date;
+            }
+
+            // Save changes and return the actual number of affected rows
+            return await base.SaveChangesAsync(cancellationToken);
+        }
     }
 }

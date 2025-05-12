@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using ShiftLogger.Study.Model;
 using ShiftLogger.Study.Model.Dto;
 
@@ -9,6 +10,7 @@ namespace ShiftLogger.Study.Services
          Task<List<Shift>> GetAllShiftsAsync();
          Task<Shift> GetShiftByIdAsync(int Id);
         Task<Shift> CreateShift(ShiftDto shift);
+        Task<Shift> UpdateShiftAsync(ShiftDto shift, int Id);
     }
     public class ShiftRepository:IShiftRepository
     {
@@ -37,6 +39,19 @@ namespace ShiftLogger.Study.Services
             var AddedEntity= await _context.Shifts.AddAsync(NewShift);
             await _context.SaveChangesAsync();
             return AddedEntity.Entity;
+        }
+        public async Task<Shift> UpdateShiftAsync(ShiftDto shift, int Id)
+        {
+            var UpdateShift = await _context.Shifts.FirstOrDefaultAsync(x => x.ShiftId == Id);
+            if(UpdateShift!=null)
+            {
+                UpdateShift.ShiftStartTime = shift.ShiftStartTime;
+                UpdateShift.ShiftEndTime = shift.ShiftEndTime;
+                UpdateShift.ShiftDate = shift.ShiftDate;
+                UpdateShift.WorkerId = shift.WorkerId;
+                await _context.SaveChangesAsync();
+            }
+            return UpdateShift;
         }
     }
 }

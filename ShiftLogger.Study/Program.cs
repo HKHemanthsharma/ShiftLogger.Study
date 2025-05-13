@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using ShiftLogger.Study.Services;
 
 namespace ShiftLogger.Study
 {
@@ -16,6 +17,8 @@ namespace ShiftLogger.Study
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ShiftDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShiftDbConnection")));
+            builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
+            builder.Services.AddScoped<IWorkerRepository, WorkerRepository>();
 
             var app = builder.Build();
 

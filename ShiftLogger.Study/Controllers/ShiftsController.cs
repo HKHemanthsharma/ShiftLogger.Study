@@ -49,5 +49,16 @@ namespace ShiftLogger.Study.Controllers
             Shift UpdatedShift = await repository.UpdateShiftAsync(shift, Id);
             return Ok(ResponseDto<Shift>.Success(UpdatedShift,"Succefully Updated"));
         }
+        [HttpDelete]
+        [Route("{Id:int}")]
+        public async Task<ActionResult<ResponseDto<Shift>>> DeleteShiftAsync([FromRoute] int Id)
+        {
+            Shift DeleteShift = await repository.DeleteShiftAsync(Id);
+            if (DeleteShift==null)
+            {
+                return (ResponseDto<Shift>.Failure(DeleteShift,"No Shift is available!!!"));
+            }
+            return Ok(ResponseDto<Shift>.Success(DeleteShift, "Shift is successfully Deleted"));
+        }
     }
 }

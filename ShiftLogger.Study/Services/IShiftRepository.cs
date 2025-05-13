@@ -11,6 +11,7 @@ namespace ShiftLogger.Study.Services
          Task<Shift> GetShiftByIdAsync(int Id);
         Task<Shift> CreateShift(ShiftDto shift);
         Task<Shift> UpdateShiftAsync(ShiftDto shift, int Id);
+        Task<Shift> DeleteShiftAsync(int Id);
     }
     public class ShiftRepository:IShiftRepository
     {
@@ -52,6 +53,13 @@ namespace ShiftLogger.Study.Services
                 await _context.SaveChangesAsync();
             }
             return UpdateShift;
+        }
+        public async Task<Shift> DeleteShiftAsync(int Id)
+        {
+            var DeleteShift = await _context.Shifts.FirstOrDefaultAsync(x => x.ShiftId == Id);
+            _context.Shifts.Remove(DeleteShift);
+            await _context.SaveChangesAsync();
+            return DeleteShift;
         }
     }
 }

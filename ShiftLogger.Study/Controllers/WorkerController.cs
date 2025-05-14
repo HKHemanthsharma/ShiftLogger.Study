@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShiftLogger.Study.Model;
 using ShiftLogger.Study.Model.Dto;
 using ShiftLogger.Study.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ShiftLogger.Study.Controllers
 {
@@ -18,51 +20,91 @@ namespace ShiftLogger.Study.Controllers
         [HttpGet]
         public async Task<ActionResult<ResponseDto<List<Worker>>>> GetAllWorkersAsync()
         {
-            List<Worker> Workers= await Repository.GetAllWorkerAsync();
-            if(Workers==null)
+            List<Worker> Workers = null;
+            try
             {
-                return NotFound(ResponseDto<List<Worker>>.Failure(Workers,"No Workers Found"));
+                Workers = await Repository.GetAllWorkerAsync();
+                if (Workers == null)
+                {
+                    return NotFound(ResponseDto<List<Worker>>.Failure(Workers, "No Workers Found"));
+                }
+                return Ok(ResponseDto<List<Worker>>.Success(Workers, "Successfully Fetched Workers"));
             }
-            return Ok(ResponseDto<List<Worker>>.Success(Workers, "Successfully Fetched Workers"));
+            catch (Exception e)
+            {
+                return ResponseDto<List<Worker>>.Failure(Workers, e.Message);
+            }
         }
         [HttpGet]
         [Route("{Id:int}")]
-        public async Task<ActionResult<ResponseDto<Worker>>> GetWorkerAsync([FromRoute] int Id)
+        public async Task<ActionResult<Worker>> GetWorkerAsync([FromRoute] int Id)
         {
-            Worker Worker = await Repository.GetWorkerAsync(Id);
-            if (Worker == null)
+            Worker Worker = null;
+            try
             {
-                return NotFound(ResponseDto<Worker>.Failure(Worker, "No Worker Found"));
+                Worker = await Repository.GetWorkerAsync(Id);
+                if (Worker == null)
+                {
+                    return NotFound(Worker);
+                }
+                return Ok(Worker);
             }
-            return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Fetched Worker"));
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
         [HttpPost]
         public async Task<ActionResult> CreateWorkerAsync([FromBody] WorkerDto NewWorker)
         {
-            Worker Worker = await Repository.CreateWorkerAsync(NewWorker);
-            return CreatedAtAction(nameof(GetWorkerAsync), new{Id=Worker.WorkerId},Worker);
+            Worker Worker = null;
+            try
+            {
+                Worker = await Repository.CreateWorkerAsync(NewWorker);
+                return CreatedAtAction(nameof(GetWorkerAsync), new { Id = Worker.WorkerId }, Worker);
+            }
+            catch(Exception e )
+            {
+                return StatusCode(501, e.Message);
+            }
         }
         [HttpPut]
         [Route("{Id:int}")]
         public async Task<ActionResult<ResponseDto<Worker>>> GetWorkerAsync([FromRoute] int Id, [FromBody]WorkerDto UpdateWorker)
         {
-            Worker Worker = await Repository.UpdateWorkerAsync(UpdateWorker, Id);
-            if (Worker == null)
+            Worker Worker = null;
+            try
             {
-                return NotFound(ResponseDto<Worker>.Failure(Worker, "No Worker Found"));
+                Worker = await Repository.UpdateWorkerAsync(UpdateWorker, Id);
+                if (Worker == null)
+                {
+                    return NotFound(ResponseDto<Worker>.Failure(Worker, "No Worker Found"));
+                }
+                return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Fetched Worker"));
             }
-            return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Fetched Worker"));
+            catch(Exception e)
+            {
+                return ResponseDto<Worker>.Failure(Worker, e.Message);
+            }
         }
         [HttpDelete]
         [Route("{Id:int}")]
         public async Task<ActionResult<ResponseDto<Worker>>> DeleteWorkerAsync([FromRoute] int Id)
         {
-            Worker Worker = await Repository.DeleteWorkerAsync(Id);
-            if (Worker == null)
+            Worker Worker = null;
+            try
             {
-                return NotFound(ResponseDto<Worker>.Failure(Worker, "No Worker Found"));
+                Worker = await Repository.DeleteWorkerAsync(Id);
+                if (Worker == null)
+                {
+                    return NotFound(ResponseDto<Worker>.Failure(Worker, "No Worker Found"));
+                }
+                return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Deleted Worker"));
             }
-            return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Deleted Worker"));
+            catch(Exception e)
+            {
+                return ResponseDto<Worker>.Failure(Worker, e.Message);
+            }
         }
     }
 }

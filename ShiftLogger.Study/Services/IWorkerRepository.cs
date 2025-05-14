@@ -40,6 +40,10 @@ namespace ShiftLogger.Study.Services
         public async Task<Worker> UpdateWorkerAsync(WorkerDto NewWorker, int Id)
         {
             Worker UpdateWorker=await context.Workers.FirstOrDefaultAsync(x => x.WorkerId == Id);
+            if (UpdateWorker == null)
+            {
+                return null;
+            }
             UpdateWorker.Name = NewWorker.Name;
             context.Workers.Update(UpdateWorker);
             await context.SaveChangesAsync();

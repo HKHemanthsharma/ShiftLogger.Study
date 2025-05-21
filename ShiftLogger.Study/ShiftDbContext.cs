@@ -17,12 +17,15 @@ namespace ShiftLogger.Study
                 .HasKey(x => x.ShiftId);
             modelBuilder.Entity<Shift>()
                 .Property(x => x.ShiftDate)
+                .HasColumnType("Date")
                 .IsRequired();
             modelBuilder.Entity<Shift>()
                 .Property(x => x.ShiftStartTime)
+                .HasColumnType("DateTime")
                 .IsRequired();
             modelBuilder.Entity<Shift>()
                 .Property(x => x.ShiftEndTime)
+                .HasColumnType("DateTime")
                 .IsRequired();
             modelBuilder.Entity<Worker>()
                 .HasKey(x => x.WorkerId);
@@ -44,32 +47,32 @@ namespace ShiftLogger.Study
             return Entities.Count();
         }
             public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            // Get all Shift entities that are added, modified, or deleted
-            var shiftEntries = ChangeTracker.Entries<Shift>()
-                .Where(x => x.State == EntityState.Added ||
-                           x.State == EntityState.Modified ||
-                           x.State == EntityState.Deleted)
-                .ToList();
-
-            // Process each entity
-            foreach (var entry in shiftEntries)
             {
-                // Skip deleted entities if you only want to process added/modified
-                if (entry.State == EntityState.Deleted)
-                    continue;
+                 // Get all Shift entities that are added, modified, or deleted
+                    var shiftEntries = ChangeTracker.Entries<Shift>()
+                        .Where(x => x.State == EntityState.Added ||
+                                   x.State == EntityState.Modified ||
+                                   x.State == EntityState.Deleted)
+                        .ToList();
 
-                var shift = entry.Entity;
+                    // Process each entity
+                    foreach (var entry in shiftEntries)
+                    {
+                        // Skip deleted entities if you only want to process added/modified
+                        if (entry.State == EntityState.Deleted)
+                            continue;
 
-                // Calculate duration
-                shift.CalculateDuration();
+                        var shift = entry.Entity;
 
-                // Set default date if null
-                shift.ShiftDate ??= DateTime.Now.Date;
+                        // Calculate duration
+                        shift.CalculateDuration();
+
+                        // Set default date if null
+                        shift.ShiftDate ??= DateTime.Now.Date;
+                    }
+
+                    // Save changes and return the actual number of affected rows
+                    return await base.SaveChangesAsync(cancellationToken);
             }
-
-            // Save changes and return the actual number of affected rows
-            return await base.SaveChangesAsync(cancellationToken);
-        }
     }
 }

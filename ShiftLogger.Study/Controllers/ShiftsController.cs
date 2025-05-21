@@ -55,10 +55,21 @@ namespace ShiftLogger.Study.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult<ResponseDto<Shift>>> GetShiftByIdAsync([FromBody]ShiftDto shift)
+        public async Task<ActionResult<ResponseDto<ShiftDto>>> CreateShiftAsync([FromBody]ShiftDto shift)
         {
-            var NewShift=await repository.CreateShift(shift);
-            return CreatedAtAction(nameof(GetShiftByIdAsync), new { Id = NewShift.ShiftId }, NewShift);
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return ResponseDto<ShiftDto>.Failure(shift, "Bad Data!! Please give the Properties for Shift with valid format");
+                }
+                var NewShift = await repository.CreateShift(shift);
+                return Ok(ResponseDto<ShiftDto>.Success(shift, "Successfully Created Shift"));
+            }
+            catch(Exception e)
+            {
+                return ResponseDto<ShiftDto>.Failure(shift, e.Message);
+            }
         }
         [HttpPut]
         [Route("{Id:int}")]
@@ -67,6 +78,10 @@ namespace ShiftLogger.Study.Controllers
             Shift UpdatedShift = null;
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return ResponseDto<Shift>.Failure(UpdatedShift, "Bad Data!! Please give the Properties for Shift with valid format");
+                }
                 UpdatedShift = await repository.UpdateShiftAsync(shift, Id);
                 return Ok(ResponseDto<Shift>.Success(UpdatedShift, "Succefully Updated"));
             }

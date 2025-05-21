@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShiftLogger.Study;
 
@@ -11,9 +12,11 @@ using ShiftLogger.Study;
 namespace ShiftLogger.Study.Migrations
 {
     [DbContext(typeof(ShiftDbContext))]
-    partial class ShiftDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250521192546_Modified Shift Model")]
+    partial class ModifiedShiftModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,11 +39,11 @@ namespace ShiftLogger.Study.Migrations
                     b.Property<double>("ShiftDuration")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("ShiftEndTime")
-                        .HasColumnType("DateTime");
+                    b.Property<TimeSpan>("ShiftEndTime")
+                        .HasColumnType("Time");
 
-                    b.Property<DateTime>("ShiftStartTime")
-                        .HasColumnType("DateTime");
+                    b.Property<TimeSpan>("ShiftStartTime")
+                        .HasColumnType("Time");
 
                     b.Property<int>("WorkerId")
                         .HasColumnType("int");

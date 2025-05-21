@@ -1,19 +1,23 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ShiftLogger.Study.Model;
 using ShiftLogger.Study.Model.Dto;
+using System;
+using System.Globalization;
+using System.Web.Mvc;
+
+
 
 namespace ShiftLogger.Study.Services
 {
     public interface IShiftRepository
     {
-         Task<List<Shift>> GetAllShiftsAsync();
-         Task<Shift> GetShiftByIdAsync(int Id);
+        Task<List<Shift>> GetAllShiftsAsync();
+        Task<Shift> GetShiftByIdAsync(int Id);
         Task<Shift> CreateShift(ShiftDto shift);
         Task<Shift> UpdateShiftAsync(ShiftDto shift, int Id);
         Task<Shift> DeleteShiftAsync(int Id);
     }
-    public class ShiftRepository:IShiftRepository
+    public class ShiftRepository : IShiftRepository
     {
         private readonly ShiftDbContext _context;
         public ShiftRepository(ShiftDbContext context)
@@ -30,25 +34,35 @@ namespace ShiftLogger.Study.Services
         }
         public async Task<Shift> CreateShift(ShiftDto shift)
         {
+            string NormalisedStartTime = DateTime.Parse(shift.ShiftStartTime).ToString("HH:mm");
+            string NormalisedSEndTime = DateTime.Parse(shift.ShiftEndTime).ToString("HH:mm");
+            DateTime.TryParseExact(shift.ShiftDate, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime ShiftDate);
+            DateTime.TryParseExact(NormalisedStartTime, "HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime ShiftStartTime);
+            DateTime.TryParseExact(NormalisedSEndTime, "HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime ShiftEndTime);
             Shift NewShift = new Shift
             {
-                ShiftDate = shift.ShiftDate,
-                ShiftStartTime= shift.ShiftStartTime,
-                ShiftEndTime=shift.ShiftEndTime,
-                WorkerId=shift.WorkerId
+                ShiftDate = ShiftDate,
+                ShiftStartTime =ShiftStartTime,
+                ShiftEndTime = ShiftEndTime,
+                WorkerId = shift.WorkerId
             };
-            var AddedEntity= await _context.Shifts.AddAsync(NewShift);
+            var AddedEntity = await _context.Shifts.AddAsync(NewShift);
             await _context.SaveChangesAsync();
             return AddedEntity.Entity;
         }
         public async Task<Shift> UpdateShiftAsync(ShiftDto shift, int Id)
         {
+            string NormalisedStartTime = DateTime.Parse(shift.ShiftStartTime).ToString("HH:mm");
+            string NormalisedSEndTime = DateTime.Parse(shift.ShiftEndTime).ToString("HH:mm");
             var UpdateShift = await _context.Shifts.FirstOrDefaultAsync(x => x.ShiftId == Id);
-            if(UpdateShift!=null)
+            DateTime.TryParseExact(shift.ShiftDate, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime ShiftDate);
+            DateTime.TryParseExact(NormalisedStartTime, "HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime ShiftStartTime);
+            DateTime.TryParseExact(NormalisedSEndTime, "HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime ShiftEndTime);
+            if (UpdateShift != null)
             {
-                UpdateShift.ShiftStartTime = shift.ShiftStartTime;
-                UpdateShift.ShiftEndTime = shift.ShiftEndTime;
-                UpdateShift.ShiftDate = shift.ShiftDate;
+                UpdateShift.ShiftStartTime = ShiftStartTime;
+                UpdateShift.ShiftEndTime =ShiftEndTime;
+                UpdateShift.ShiftDate = ShiftDate;
                 UpdateShift.WorkerId = shift.WorkerId;
                 await _context.SaveChangesAsync();
             }

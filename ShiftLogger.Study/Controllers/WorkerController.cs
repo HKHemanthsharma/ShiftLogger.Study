@@ -55,13 +55,13 @@ namespace ShiftLogger.Study.Controllers
             }
         }
         [HttpPost]
-        public async Task<ActionResult> CreateWorkerAsync([FromBody] WorkerDto NewWorker)
+        public async Task<ActionResult<ResponseDto<Worker>>> CreateWorkerAsync([FromBody] WorkerDto NewWorker)
         {
             Worker Worker = null;
             try
             {
                 Worker = await Repository.CreateWorkerAsync(NewWorker);
-                return CreatedAtAction(nameof(GetWorkerAsync), new { Id = Worker.WorkerId }, Worker);
+                return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Created Worker"));
             }
             catch(Exception e )
             {
@@ -80,7 +80,7 @@ namespace ShiftLogger.Study.Controllers
                 {
                     return NotFound(ResponseDto<Worker>.Failure(Worker, "No Worker Found"));
                 }
-                return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Fetched Worker"));
+                return Ok(ResponseDto<Worker>.Success(Worker, "Successfully Updated Worker"));
             }
             catch(Exception e)
             {

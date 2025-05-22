@@ -1,4 +1,6 @@
-﻿namespace ShiftLogger.Study.Model
+﻿using System.Text.Json.Serialization;
+
+namespace ShiftLogger.Study.Model
 {
     public class Shift
     {
@@ -8,6 +10,7 @@
         public DateTime ShiftEndTime { get; set; }  
         public double ShiftDuration { get; set; }
         public DateTime? ShiftDate { get; set; }
+        [JsonIgnore]
         public Worker Worker { get; set; }
         public void CalculateDuration()
         {

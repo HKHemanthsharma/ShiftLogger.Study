@@ -35,7 +35,7 @@ namespace ShiftLogger.Study.Controllers
             }
         }
         [HttpGet]
-        [Route("{id:int}")]
+        [Route("{Id:int}")]
         public async Task<ActionResult<ResponseDto<Shift>>> GetShiftByIdAsync([FromRoute] int Id)
         {
             Shift Data = null;

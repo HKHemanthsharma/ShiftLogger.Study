@@ -21,11 +21,12 @@ namespace ShiftLogger.Study.Services
         }
         public async Task<List<Worker>> GetAllWorkerAsync()
         {
-            return await context.Workers.ToListAsync();
+            return await context.Workers.Include(x => x.Shifts).ToListAsync();
+           
         }
         public async Task<Worker> GetWorkerAsync(int Id)
         {
-            return await context.Workers.FirstOrDefaultAsync(x => x.WorkerId == Id);     
+            return await context.Workers.Include(x=>x.Shifts).FirstOrDefaultAsync(x => x.WorkerId == Id);     
         }
         public async Task<Worker> CreateWorkerAsync(WorkerDto NewWorker)
         {
@@ -39,7 +40,7 @@ namespace ShiftLogger.Study.Services
         }
         public async Task<Worker> UpdateWorkerAsync(WorkerDto NewWorker, int Id)
         {
-            Worker UpdateWorker=await context.Workers.FirstOrDefaultAsync(x => x.WorkerId == Id);
+            Worker UpdateWorker=await context.Workers.Include(x=>x.Shifts).FirstOrDefaultAsync(x => x.WorkerId == Id);
             if (UpdateWorker == null)
             {
                 return null;

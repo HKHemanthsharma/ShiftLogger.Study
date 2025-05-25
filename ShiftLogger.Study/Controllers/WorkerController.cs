@@ -37,21 +37,22 @@ namespace ShiftLogger.Study.Controllers
         }
         [HttpGet]
         [Route("{Id:int}")]
-        public async Task<ActionResult<Worker>> GetWorkerAsync([FromRoute] int Id)
+        public async Task<ActionResult<List<Worker>>> GetWorkerAsync([FromRoute] int Id)
         {
-            Worker Worker = null;
+            List<Worker> Workers = null;
             try
             {
-                Worker = await Repository.GetWorkerAsync(Id);
-                if (Worker == null)
+                var worker = await Repository.GetWorkerAsync(Id);
+                if (worker == null)
                 {
-                    return NotFound(Worker);
+                    return NotFound(ResponseDto<List<Worker>>.Failure(Workers, "No Workers Found"));
                 }
-                return Ok(Worker);
+                Workers.Add(worker);
+                return Ok(ResponseDto<List<Worker>>.Success(Workers, "Successfully Fetched Workers"));
             }
             catch (Exception e)
             {
-                return StatusCode(500, e.Message);
+                return Ok(ResponseDto<List<Worker>>.Failure(Workers, e.Message));
             }
         }
         [HttpPost]

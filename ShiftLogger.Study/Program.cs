@@ -19,6 +19,13 @@ namespace ShiftLogger.Study
             builder.Services.AddDbContext<ShiftDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShiftDbConnection")));
             builder.Services.AddScoped<IShiftRepository, ShiftRepository>();
             builder.Services.AddScoped<IWorkerRepository, WorkerRepository>();
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowAll", builder => {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
 
             var app = builder.Build();
 
@@ -28,6 +35,11 @@ namespace ShiftLogger.Study
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            
+
+            // ...
+
+            app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
 

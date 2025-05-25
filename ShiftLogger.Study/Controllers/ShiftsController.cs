@@ -36,21 +36,22 @@ namespace ShiftLogger.Study.Controllers
         }
         [HttpGet]
         [Route("{Id:int}")]
-        public async Task<ActionResult<ResponseDto<Shift>>> GetShiftByIdAsync([FromRoute] int Id)
+        public async Task<ActionResult<ResponseDto<List<Shift>>>> GetShiftByIdAsync([FromRoute] int Id)
         {
-            Shift Data = null;
+            List<Shift> DataList = new List<Shift>();
             try
             {
-                Data = await repository.GetShiftByIdAsync(Id);
+                var Data = await repository.GetShiftByIdAsync(Id);
                 if (Data == null)
                 {
-                    return NotFound(ResponseDto<Shift>.Failure(Data, "No Data Found"));
+                    return NotFound(ResponseDto<List<Shift>>.Failure(DataList, "No Data Found"));
                 }
-                return ResponseDto<Shift>.Success(Data, "Successfully Fetched The Data!!!");
+                DataList.Add(Data);
+                return ResponseDto<List<Shift>>.Success(DataList, "Successfully Fetched The Data!!!");
             }
             catch(Exception e)
             {
-               return ResponseDto<Shift>.Failure(Data, e.Message);
+               return ResponseDto<List<Shift>>.Failure(DataList, e.Message);
             }
         }
         

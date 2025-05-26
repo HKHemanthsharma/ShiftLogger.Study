@@ -1,5 +1,6 @@
 ﻿using ShiftsLoggerUI.Model;
 using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace ShiftsLoggerUI.Repository
@@ -7,8 +8,8 @@ namespace ShiftsLoggerUI.Repository
     public interface IShiftRepository
     {
         public  Task<ResponseDto<List<Shift>>> GetAllShifts();
-        public Task<ResponseDto<Shift>> GetSingleShift();
-        public Task<ResponseDto<Shift>> CreateShift();
+        public Task<ResponseDto<List<Shift>>> GetSingleShift(int Id);
+        public Task<ResponseDto<Shift>> CreateShift(Shift Newshift);
         public Task<ResponseDto<Shift>> DeleteShift();
         public Task<ResponseDto<Shift>> UpdateShift();
     }
@@ -19,9 +20,23 @@ namespace ShiftsLoggerUI.Repository
         {
             client = _client;
         }
-        public async Task<ResponseDto<Shift>> CreateShift()
+        public async Task<ResponseDto<Shift>> CreateShift(Shift Newshift)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient ShiftClient = client.GetClient();
+                string ShiftUrl = client.GetBaseUrl() + "Shifts";
+                var objectresponse = await ShiftClient.PostAsJsonAsync(ShiftUrl, Newshift);
+                var ResponseStream = await objectresponse.Content.ReadAsStreamAsync();
+                ResponseDto<Shift> CreatedResponse=await JsonSerializer.DeserializeAsync<ResponseDto<Shift>>(ResponseStream);
+                return CreatedResponse;
+              
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
 
         public async Task<ResponseDto<Shift>> DeleteShift()
@@ -48,9 +63,23 @@ namespace ShiftsLoggerUI.Repository
             return null;
         }
 
-        public async Task<ResponseDto<Shift>> GetSingleShift()
+        public async Task<ResponseDto<List<Shift>>> GetSingleShift(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient ShiftClient = client.GetClient();
+                string ShiftUrl = client.GetBaseUrl() + $"Shifts/{Id}";
+                using (Stream stream = await ShiftClient.GetStreamAsync(ShiftUrl))
+                {
+                    var objectresponse = JsonSerializer.Deserialize<ResponseDto<List<Shift>>>(stream);
+                    return objectresponse;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
 
         public async Task<ResponseDto<Shift>> UpdateShift()

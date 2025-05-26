@@ -45,6 +45,7 @@ namespace ShiftsLoggerUI
                     Shiftservice.GetAllShifts();
                     break;
                 case "View a single Shift":
+                    Shiftservice.GetSingleShift();
                     break;
                 case "Delete a shift":
                     break;
@@ -58,7 +59,7 @@ namespace ShiftsLoggerUI
         {
             if (response.IsSuccess)
             {
-                Panel Messagepanel = new Panel($"[aqua] {response.Message}[/]");
+                Panel Messagepanel = new Panel(Markup.Escape($"[aqua] {response.Message}[/]"));
                 Messagepanel.Header = new PanelHeader("[green3_1] Response Message:[/]");
                 Messagepanel.Border = BoxBorder.Double;
                 Messagepanel.Padding = new Padding(2, 2, 2, 2);
@@ -103,7 +104,11 @@ namespace ShiftsLoggerUI
             }
             else
             {
-                Console.WriteLine("Not Implemented Yet!!!");
+                Panel Messagepanel = new Panel($"Read this to understand more: [plum2] {response.Message}[/]");
+                Messagepanel.Header = new PanelHeader("[red3_1] Failed to Retrieve Data[/]");
+                Messagepanel.Border = BoxBorder.Double;
+                Messagepanel.Padding = new Padding(2, 2, 2, 2);
+                AnsiConsole.Write(Messagepanel);
                 Console.ReadLine();
             }
         }

@@ -44,7 +44,7 @@ namespace ShiftLogger.Study.Controllers
                 var Data = await repository.GetShiftByIdAsync(Id);
                 if (Data == null)
                 {
-                    return NotFound(ResponseDto<List<Shift>>.Failure(DataList, "No Data Found"));
+                    return ResponseDto<List<Shift>>.Failure(DataList, "No Shifts with Given ID");
                 }
                 DataList.Add(Data);
                 return ResponseDto<List<Shift>>.Success(DataList, "Successfully Fetched The Data!!!");

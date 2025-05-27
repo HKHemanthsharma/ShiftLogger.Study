@@ -16,15 +16,16 @@ namespace ShiftsLoggerUI.Services
     public class ShiftService:IShiftService
     {
         private readonly IShiftRepository repository;
-
-        public ShiftService(IShiftRepository _repo)
+        private readonly UserInputs Uinp;
+        public ShiftService(IShiftRepository _repo, UserInputs ui)
         {
             repository = _repo;
+            Uinp = ui;
             
         }
         public void CreateShift()
         {
-            Shift NewShift = null;
+            Shift NewShift = Uinp.GetNewShift().GetAwaiter().GetResult();
             ResponseDto<Shift> CreateResponse = repository.CreateShift(NewShift).GetAwaiter().GetResult();
         }
 
@@ -41,7 +42,7 @@ namespace ShiftsLoggerUI.Services
 
         public void GetSingleShift()
         {
-            int ShiftId = UserInputs.InputId();
+            int ShiftId = Uinp.InputId();
             ResponseDto<List<Shift>> Shiftresponse = repository.GetSingleShift(ShiftId).GetAwaiter().GetResult();
             UserInterface.ShowResponse(Shiftresponse);
         }

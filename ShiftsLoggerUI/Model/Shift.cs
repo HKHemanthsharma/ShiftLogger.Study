@@ -10,21 +10,21 @@ namespace ShiftsLoggerUI.Model
     public class Shift
     {
         [JsonPropertyName("shiftId")]
-        public int ShiftId { get; set; }
+        public int shiftId { get; set; }
 
         [JsonPropertyName("workerId")]
-        public int WorkerId { get; set; }
+        public int workerId { get; set; }
 
         [JsonPropertyName("shiftStartTime")]
-        public string ShiftStartTime { get; set; } // Treat as string
+        public string shiftStartTime { get; set; } // Treat as string
 
         [JsonPropertyName("shiftEndTime")]
-        public string ShiftEndTime { get; set; } // Treat as string
+        public string shiftEndTime { get; set; } // Treat as string
 
         [JsonPropertyName("shiftDuration")]
-        public double ShiftDuration { get; set; }
+        public double? shiftDuration { get; set; }
 
         [JsonPropertyName("shiftDate")]
-        public string ShiftDate { get; set; } // Treat as string
+        public string shiftDate { get; set; } // Treat as string
     }
 }

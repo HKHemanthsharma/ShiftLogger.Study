@@ -10,9 +10,11 @@ namespace ShiftsLoggerUI
     public class UserInterface
     {
         private readonly IShiftService Shiftservice;
-        public UserInterface(IShiftService _service)
+        private readonly IWorkerService Workerservice;
+        public UserInterface(IShiftService _service, IWorkerService _WorkerService)
         {
             Shiftservice = _service;
+            Workerservice = _WorkerService;
         }
         public void MainMenu()
         {
@@ -28,9 +30,36 @@ namespace ShiftsLoggerUI
                     ShiftServiceMenu();
                     break;
                 case "Manage Workers":
+                    WorkerServiceMenu();
                     break;
             }
         }
+
+        private void WorkerServiceMenu()
+        {
+            var userOption = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Please select an option")
+                .AddChoices(["ViewAllWorkers", "View a single Worker", "Delete a Worker", "Create a new Worker", "Update a Worker"])
+                );
+
+            switch (userOption)
+            {
+                case "ViewAllWorkers":
+                    Workerservice.GetAllWorkers();
+                    break;
+                case "View a single Worker":
+                    Shiftservice.GetSingleShift();
+                    break;
+                case "Delete a Worker":
+                    break;
+                case "Create a new Worker":
+                    break;
+                case "Update a Worker":
+                    break;
+            }
+        }
+
         public void ShiftServiceMenu()
         {
             var userOption = AnsiConsole.Prompt(
@@ -50,6 +79,7 @@ namespace ShiftsLoggerUI
                 case "Delete a shift":
                     break;
                 case "Create a new Shift":
+                    Shiftservice.CreateShift();
                     break;
                 case "Update a Shift":
                     break;
@@ -59,7 +89,7 @@ namespace ShiftsLoggerUI
         {
             if (response.IsSuccess)
             {
-                Panel Messagepanel = new Panel(Markup.Escape($"[aqua] {response.Message}[/]"));
+                Panel Messagepanel = new Panel($"[aqua]{Markup.Escape(response.Message)}[/]");
                 Messagepanel.Header = new PanelHeader("[green3_1] Response Message:[/]");
                 Messagepanel.Border = BoxBorder.Double;
                 Messagepanel.Padding = new Padding(2, 2, 2, 2);
@@ -80,7 +110,7 @@ namespace ShiftsLoggerUI
                 }
                 if (ElementType == typeof(Worker))
                 {
-                    props = typeof(Worker).GetProperties();
+                    props = typeof(Worker).GetProperties().Take(2).ToArray();
                 }
                 var columnValues = new List<string>();
                 foreach(var prop in props)
@@ -93,13 +123,37 @@ namespace ShiftsLoggerUI
                     var RowValues = new List<string>();
                     foreach (var prop in props)
                     {
-                        RowValues.Add(prop.GetValue(obj).ToString());
+                        RowValues.Add(Markup.Escape(prop.GetValue(obj).ToString()));
                     }
                     ResponseTable.AddRow(RowValues.ToArray());
                 }
                 ResponseTable.Title = new TableTitle("[orange3] Here is the Retrieved Data[/]");
                 ResponseTable.Border(TableBorder.AsciiDoubleHead);
                 AnsiConsole.Write(ResponseTable);
+                AnsiConsole.MarkupLine("[mistyrose3]Details of shifts done by workers[/]\n Note: [lightcyan1]Details not shown for Workers that have not done any shifts yet![/]");
+                if (ElementType == typeof(Worker))
+                {
+                    foreach (var obj in ResponseObjects)
+                    {
+                        Worker worker = (Worker)obj;
+                        List<Shift> Shifts = worker.Shifts;
+                        Table WorkerShiftTable = new();
+                        WorkerShiftTable.Title = new TableTitle($"[yellow3_1] Here is the Shift Details of the {worker.Name}[/]");
+                        var TableProps = typeof(Shift).GetProperties().ToList();
+                        TableProps.ForEach(x => WorkerShiftTable.AddColumn(Markup.Escape(x.Name.ToString())));
+                        foreach(var shift in Shifts)
+                        {
+                            WorkerShiftTable.AddRow(shift.shiftId.ToString(), shift.workerId.ToString(), shift.shiftStartTime.ToString(), shift.shiftEndTime.ToString(),
+                                shift.shiftDuration.ToString(), shift.shiftDate.ToString());
+                        }
+                        WorkerShiftTable.Border = TableBorder.HeavyEdge;
+                        if (Shifts.Count > 0)
+                        {
+                            AnsiConsole.Write(WorkerShiftTable);
+                        }
+                    }
+                }
+               
                 Console.ReadLine();
             }
             else

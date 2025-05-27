@@ -52,7 +52,7 @@ namespace ShiftsLoggerUI.Repository
                 string ShiftUrl = client.GetBaseUrl() + "Shifts";
                 using (Stream stream = await ShiftClient.GetStreamAsync(ShiftUrl))
                 {
-                    var objectresponse = JsonSerializer.Deserialize<ResponseDto<List<Shift>>>(stream);
+                    var objectresponse = await JsonSerializer.DeserializeAsync<ResponseDto<List<Shift>>>(stream);
                     return objectresponse;
                 }
             }

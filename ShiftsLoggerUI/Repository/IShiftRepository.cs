@@ -11,7 +11,7 @@ namespace ShiftsLoggerUI.Repository
         public Task<ResponseDto<List<Shift>>> GetSingleShift(int Id);
         public Task<ResponseDto<Shift>> CreateShift(Shift Newshift);
         public Task<ResponseDto<Shift>> DeleteShift();
-        public Task<ResponseDto<Shift>> UpdateShift();
+        public Task<ResponseDto<Shift>> UpdateShift(Shift UpdatedShift);
     }
     public class ShiftRepostory : IShiftRepository
     {
@@ -29,8 +29,7 @@ namespace ShiftsLoggerUI.Repository
                 var objectresponse = await ShiftClient.PostAsJsonAsync(ShiftUrl, Newshift);
                 var ResponseStream = await objectresponse.Content.ReadAsStreamAsync();
                 ResponseDto<Shift> CreatedResponse=await JsonSerializer.DeserializeAsync<ResponseDto<Shift>>(ResponseStream);
-                return CreatedResponse;
-              
+                return CreatedResponse;      
             }
             catch (Exception e)
             {
@@ -82,9 +81,28 @@ namespace ShiftsLoggerUI.Repository
             return null;
         }
 
-        public async Task<ResponseDto<Shift>> UpdateShift()
+        public async Task<ResponseDto<Shift>> UpdateShift(Shift UpdatedShift)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient ShiftClient = client.GetClient();
+                string ShiftUrl = client.GetBaseUrl() + $"Shifts/{UpdatedShift.shiftId}";
+                var ObjectResponse = await ShiftClient.PutAsJsonAsync(ShiftUrl, new ShiftDto
+                {
+                    workerId = UpdatedShift.workerId,
+                    shiftStartTime = UpdatedShift.shiftStartTime,
+                    shiftEndTime = UpdatedShift.shiftEndTime,
+                    shiftDate= UpdatedShift.shiftDate
+                });
+                var ResponseStream=await ObjectResponse.Content.ReadAsStreamAsync();
+                ResponseDto<Shift> UpdatedResponse = await JsonSerializer.DeserializeAsync < ResponseDto<Shift>>(ResponseStream);
+                return UpdatedResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
     }
 }

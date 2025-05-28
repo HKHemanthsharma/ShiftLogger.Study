@@ -27,6 +27,8 @@ namespace ShiftsLoggerUI.Services
         {
             Shift NewShift = Uinp.GetNewShift().GetAwaiter().GetResult();
             ResponseDto<Shift> CreateResponse = repository.CreateShift(NewShift).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(CreateResponse);
+
         }
 
         public void DeleteShift()
@@ -49,7 +51,10 @@ namespace ShiftsLoggerUI.Services
 
         public void UpdateShift()
         {
-            throw new NotImplementedException();
+            Shift UpdatedShift = Uinp.SelectShift().GetAwaiter().GetResult();
+            UpdatedShift=Uinp.GetUpdateShift(UpdatedShift).GetAwaiter().GetResult();
+            ResponseDto<Shift> UpdateResponse = repository.UpdateShift(UpdatedShift).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(UpdateResponse);
         }
     }
 }

@@ -82,6 +82,7 @@ namespace ShiftsLoggerUI
                     Shiftservice.CreateShift();
                     break;
                 case "Update a Shift":
+                    Shiftservice.UpdateShift();
                     break;
             }
         }
@@ -95,61 +96,64 @@ namespace ShiftsLoggerUI
                 Messagepanel.Padding = new Padding(2, 2, 2, 2);
                 AnsiConsole.Write(Messagepanel);
                 Messagepanel.Expand = true;
-                ICollection ResponseObjects = (ICollection)response.Data;
-                if(ResponseObjects.Count==0)
+                if (response.Message == "Successfully Fetched The Data!!!" || response.Message == "Successfully Fetched Data!")
                 {
-                    Panel EmptyMessagepanel = new Panel($"[darkseagreen1]No Data To Show!!![/]");
-                    return;
-                }
-                Table ResponseTable = new();
-                PropertyInfo[] props = null;
-                Type ElementType = GetElementType(typeof(T));
-                if (ElementType == typeof(Shift))
-                {
-                    props = typeof(Shift).GetProperties();
-                }
-                if (ElementType == typeof(Worker))
-                {
-                    props = typeof(Worker).GetProperties().Take(2).ToArray();
-                }
-                var columnValues = new List<string>();
-                foreach(var prop in props)
-                {
-                    columnValues.Add(prop.Name.ToString());
-                }
-                ResponseTable.AddColumns(columnValues.ToArray());
-                foreach (var obj in ResponseObjects)
-                {
-                    var RowValues = new List<string>();
+                    ICollection ResponseObjects = (ICollection)response.Data;
+                    if (ResponseObjects.Count == 0)
+                    {
+                        Panel EmptyMessagepanel = new Panel($"[darkseagreen1]No Data To Show!!![/]");
+                        return;
+                    }
+                    Table ResponseTable = new();
+                    PropertyInfo[] props = null;
+                    Type ElementType = GetElementType(typeof(T));
+                    if (ElementType == typeof(Shift))
+                    {
+                        props = typeof(Shift).GetProperties();
+                    }
+                    if (ElementType == typeof(Worker))
+                    {
+                        props = typeof(Worker).GetProperties().Take(2).ToArray();
+                    }
+                    var columnValues = new List<string>();
                     foreach (var prop in props)
                     {
-                        RowValues.Add(Markup.Escape(prop.GetValue(obj).ToString()));
+                        columnValues.Add(prop.Name.ToString());
                     }
-                    ResponseTable.AddRow(RowValues.ToArray());
-                }
-                ResponseTable.Title = new TableTitle("[orange3] Here is the Retrieved Data[/]");
-                ResponseTable.Border(TableBorder.AsciiDoubleHead);
-                AnsiConsole.Write(ResponseTable);
-                AnsiConsole.MarkupLine("[mistyrose3]Details of shifts done by workers[/]\n Note: [lightcyan1]Details not shown for Workers that have not done any shifts yet![/]");
-                if (ElementType == typeof(Worker))
-                {
+                    ResponseTable.AddColumns(columnValues.ToArray());
                     foreach (var obj in ResponseObjects)
                     {
-                        Worker worker = (Worker)obj;
-                        List<Shift> Shifts = worker.Shifts;
-                        Table WorkerShiftTable = new();
-                        WorkerShiftTable.Title = new TableTitle($"[yellow3_1] Here is the Shift Details of the {worker.Name}[/]");
-                        var TableProps = typeof(Shift).GetProperties().ToList();
-                        TableProps.ForEach(x => WorkerShiftTable.AddColumn(Markup.Escape(x.Name.ToString())));
-                        foreach(var shift in Shifts)
+                        var RowValues = new List<string>();
+                        foreach (var prop in props)
                         {
-                            WorkerShiftTable.AddRow(shift.shiftId.ToString(), shift.workerId.ToString(), shift.shiftStartTime.ToString(), shift.shiftEndTime.ToString(),
-                                shift.shiftDuration.ToString(), shift.shiftDate.ToString());
+                            RowValues.Add(Markup.Escape(prop.GetValue(obj).ToString()));
                         }
-                        WorkerShiftTable.Border = TableBorder.HeavyEdge;
-                        if (Shifts.Count > 0)
+                        ResponseTable.AddRow(RowValues.ToArray());
+                    }
+                    ResponseTable.Title = new TableTitle("[orange3] Here is the Retrieved Data[/]");
+                    ResponseTable.Border(TableBorder.AsciiDoubleHead);
+                    AnsiConsole.Write(ResponseTable);
+                    AnsiConsole.MarkupLine("[mistyrose3]Details of shifts done by workers[/]\n Note: [lightcyan1]Details not shown for Workers that have not done any shifts yet![/]");
+                    if (ElementType == typeof(Worker))
+                    {
+                        foreach (var obj in ResponseObjects)
                         {
-                            AnsiConsole.Write(WorkerShiftTable);
+                            Worker worker = (Worker)obj;
+                            List<Shift> Shifts = worker.Shifts;
+                            Table WorkerShiftTable = new();
+                            WorkerShiftTable.Title = new TableTitle($"[yellow3_1] Here is the Shift Details of the {worker.Name}[/]");
+                            var TableProps = typeof(Shift).GetProperties().ToList();
+                            TableProps.ForEach(x => WorkerShiftTable.AddColumn(Markup.Escape(x.Name.ToString())));
+                            foreach (var shift in Shifts)
+                            {
+                                WorkerShiftTable.AddRow(shift.shiftId.ToString(), shift.workerId.ToString(), shift.shiftStartTime.ToString(), shift.shiftEndTime.ToString(),
+                                    shift.shiftDuration.ToString(), shift.shiftDate.ToString());
+                            }
+                            WorkerShiftTable.Border = TableBorder.HeavyEdge;
+                            if (Shifts.Count > 0)
+                            {
+                                AnsiConsole.Write(WorkerShiftTable);
+                            }
                         }
                     }
                 }
@@ -181,6 +185,19 @@ namespace ShiftsLoggerUI
 
             // Case 3: T is already the element type (e.g., T = Shift)
             return type;
+        }
+        public static void ShowShift(Shift shift)
+        {
+            Panel Messagepanel = new Panel($"[aqua] Shift Id:{shift.shiftId}\n" +
+                $"Worker Id:{shift.workerId}\n" +
+                $"ShiftStartTime:{shift.shiftStartTime}\n" +
+                $"ShiftEndTime:{shift.shiftEndTime}\n" +
+                $"ShiftDate:{shift.shiftDate}\n" +
+                $"ShiftDuration:{shift.shiftDuration}[/]");
+            Messagepanel.Header = new PanelHeader("[green3_1] Present Shift[/]");
+            Messagepanel.Border = BoxBorder.Double;
+            Messagepanel.Padding = new Padding(2, 2, 2, 2);
+            AnsiConsole.Write(Messagepanel);
         }
     }
 }

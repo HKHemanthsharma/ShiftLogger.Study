@@ -4,6 +4,7 @@ using Spectre.Console;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ShiftsLoggerUI
 {
@@ -18,20 +19,28 @@ namespace ShiftsLoggerUI
         }
         public void MainMenu()
         {
-            var userOption = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                .Title("Please select an option")
-                .AddChoices(["Manage Shifts", "Manage Workers"])
-                );
-
-            switch (userOption)
+            bool IsAppRunning = true;
+            while (IsAppRunning)
             {
-                case "Manage Shifts":
-                    ShiftServiceMenu();
-                    break;
-                case "Manage Workers":
-                    WorkerServiceMenu();
-                    break;
+                Console.Clear();
+                var userOption = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                    .Title("Please select an option")
+                    .AddChoices(["Manage Shifts", "Manage Workers","Exit"])
+                    );
+
+                switch (userOption)
+                {
+                    case "Manage Shifts":
+                        ShiftServiceMenu();
+                        break;
+                    case "Manage Workers":
+                        WorkerServiceMenu();
+                        break;
+                    case "Exit":
+                        IsAppRunning = false;
+                        break;
+                }
             }
         }
 
@@ -40,7 +49,7 @@ namespace ShiftsLoggerUI
             var userOption = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("Please select an option")
-                .AddChoices(["ViewAllWorkers", "View a single Worker", "Delete a Worker", "Create a new Worker", "Update a Worker"])
+                .AddChoices(["ViewAllWorkers", "View a single Worker", "Delete a Worker", "Create a new Worker", "Update a Worker","Exit"])
                 );
 
             switch (userOption)
@@ -49,13 +58,18 @@ namespace ShiftsLoggerUI
                     Workerservice.GetAllWorkers();
                     break;
                 case "View a single Worker":
-                    Shiftservice.GetSingleShift();
+                    Workerservice.GetSingleWorker();
                     break;
                 case "Delete a Worker":
+                    Workerservice.DeleteWorker();
                     break;
                 case "Create a new Worker":
+                    Workerservice.CreateWorker();
                     break;
                 case "Update a Worker":
+                    Workerservice.UpdateWorker();
+                    break;
+                case "Exit":
                     break;
             }
         }
@@ -65,7 +79,7 @@ namespace ShiftsLoggerUI
             var userOption = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("Please select an option")
-                .AddChoices(["ViewAllShifts", "View a single Shift", "Delete a shift", "Create a new Shift", "Update a Shift"])
+                .AddChoices(["ViewAllShifts", "View a single Shift", "Delete a shift", "Create a new Shift", "Update a Shift","Exit"])
                 );
 
             switch (userOption)
@@ -77,12 +91,15 @@ namespace ShiftsLoggerUI
                     Shiftservice.GetSingleShift();
                     break;
                 case "Delete a shift":
+                    Shiftservice.DeleteShift();
                     break;
                 case "Create a new Shift":
                     Shiftservice.CreateShift();
                     break;
                 case "Update a Shift":
                     Shiftservice.UpdateShift();
+                    break;
+                case "Exit":
                     break;
             }
         }
@@ -96,7 +113,8 @@ namespace ShiftsLoggerUI
                 Messagepanel.Padding = new Padding(2, 2, 2, 2);
                 AnsiConsole.Write(Messagepanel);
                 Messagepanel.Expand = true;
-                if (response.Message == "Successfully Fetched The Data!!!" || response.Message == "Successfully Fetched Data!")
+                if (response.Message == "Successfully Fetched The Data!!!" || response.Message == "Successfully Fetched Data!"
+                    || response.Message == "Successfully Fetched Workers" || response.Message == "Successfully Fetched The Data!!!")
                 {
                     ICollection ResponseObjects = (ICollection)response.Data;
                     if (ResponseObjects.Count == 0)

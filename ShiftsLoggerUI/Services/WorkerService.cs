@@ -28,12 +28,16 @@ namespace ShiftsLoggerUI.Services
         }
         public void CreateWorker()
         {
-            throw new NotImplementedException();
+            string newWorker =  Uinp.GetNewName().GetAwaiter().GetResult();
+            ResponseDto<Worker> worker = repository.CreateWorker(newWorker).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(worker);
         }
 
         public void DeleteWorker()
         {
-            throw new NotImplementedException();
+            Worker newWorker = Uinp.GetSelectWorker().GetAwaiter().GetResult();
+            ResponseDto<Worker> worker = repository.DeleteWorker(newWorker.WorkerId).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(worker);
         }
 
         public void GetAllWorkers()
@@ -44,12 +48,16 @@ namespace ShiftsLoggerUI.Services
 
         public void GetSingleWorker()
         {
-            throw new NotImplementedException();
+            int WorkerId = Uinp.InputId();
+            ResponseDto<List<Worker>> workers = repository.GetSingleWorker(WorkerId).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(workers);
         }
 
         public void UpdateWorker()
         {
-            throw new NotImplementedException();
+            Worker newWorker = Uinp.GetSelectWorker().GetAwaiter().GetResult();
+            ResponseDto<Worker> worker = repository.UpdateWorker(newWorker).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(worker);
         }
     }
 }

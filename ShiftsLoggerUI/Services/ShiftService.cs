@@ -33,7 +33,9 @@ namespace ShiftsLoggerUI.Services
 
         public void DeleteShift()
         {
-            throw new NotImplementedException();
+            int ToBeDeleteShift = Uinp.SelectDeleteShift().GetAwaiter().GetResult();
+            ResponseDto<Shift> CreateResponse = repository.DeleteShift(ToBeDeleteShift).GetAwaiter().GetResult();
+            UserInterface.ShowResponse(CreateResponse);
         }
 
         public void GetAllShifts()

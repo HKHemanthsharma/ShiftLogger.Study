@@ -10,7 +10,7 @@ namespace ShiftsLoggerUI.Repository
         public  Task<ResponseDto<List<Shift>>> GetAllShifts();
         public Task<ResponseDto<List<Shift>>> GetSingleShift(int Id);
         public Task<ResponseDto<Shift>> CreateShift(Shift Newshift);
-        public Task<ResponseDto<Shift>> DeleteShift();
+        public Task<ResponseDto<Shift>> DeleteShift(int DeleteId);
         public Task<ResponseDto<Shift>> UpdateShift(Shift UpdatedShift);
     }
     public class ShiftRepostory : IShiftRepository
@@ -38,9 +38,22 @@ namespace ShiftsLoggerUI.Repository
             return null;
         }
 
-        public async Task<ResponseDto<Shift>> DeleteShift()
+        public async Task<ResponseDto<Shift>> DeleteShift(int DeleteId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient ShiftClient = client.GetClient();
+                string ShiftUrl = client.GetBaseUrl() + $"Shifts/{DeleteId}";
+                var objectresponse = await ShiftClient.DeleteAsync(ShiftUrl);
+                var ResponseStream = await objectresponse.Content.ReadAsStreamAsync();
+                ResponseDto<Shift> CreatedResponse = await JsonSerializer.DeserializeAsync<ResponseDto<Shift>>(ResponseStream);
+                return CreatedResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
 
         public async Task<ResponseDto<List<Shift>>> GetAllShifts()

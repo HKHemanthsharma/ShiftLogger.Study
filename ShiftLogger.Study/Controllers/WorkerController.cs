@@ -39,7 +39,7 @@ namespace ShiftLogger.Study.Controllers
         [Route("{Id:int}")]
         public async Task<ActionResult<List<Worker>>> GetWorkerAsync([FromRoute] int Id)
         {
-            List<Worker> Workers = null;
+            List<Worker> Workers = new List<Worker>();
             try
             {
                 var worker = await Repository.GetWorkerAsync(Id);

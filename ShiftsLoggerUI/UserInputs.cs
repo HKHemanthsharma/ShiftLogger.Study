@@ -73,13 +73,25 @@ namespace ShiftsLoggerUI
         {
             var ShiftResponse = await Shiftrepository.GetAllShifts();
             List<Shift> Shifts = (List<Shift>)ShiftResponse.Data;
-            List<string> ShiftNames = Shifts.Select(x => $"{x.shiftId}:{x.workerId}:{x.shiftDate}:{x.shiftStartTime}:{x.shiftEndTime}").ToList();
+            List<string> ShiftNames = Shifts.Select(x => $"ShiftID-{x.shiftId}:WorkerId-{x.workerId}:{x.shiftDate}:{x.shiftStartTime}:{x.shiftEndTime}").ToList();
             var userChoice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Please select the Worker")
                     .AddChoices(ShiftNames));
-            int SelectedShiftId = int.Parse(userChoice.Split(":")[0]);
+            int SelectedShiftId = int.Parse(userChoice.Split(":")[0].Split("-")[1]);
             return Shifts.Where(x => x.shiftId == SelectedShiftId).FirstOrDefault();
+        }
+        public async Task<int> SelectDeleteShift()
+        {
+            var ShiftResponse = await Shiftrepository.GetAllShifts();
+            List<Shift> Shifts = (List<Shift>)ShiftResponse.Data;
+            List<string> ShiftNames = Shifts.Select(x => $"ShiftID-{x.shiftId}:WorkerId-{x.workerId}:{x.shiftDate}:{x.shiftStartTime}:{x.shiftEndTime}").ToList();
+            var userChoice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Please select the Worker")
+                    .AddChoices(ShiftNames));
+            int SelectedShiftId = int.Parse(userChoice.Split(":")[0].Split("-")[1]);
+            return SelectedShiftId;
         }
         public async Task<Shift> GetUpdateShift(Shift updatedShift)
         {
@@ -135,6 +147,25 @@ namespace ShiftsLoggerUI
             }
             updatedShift.shiftDate = DateTime.Parse(updatedShift.shiftDate).ToString("dd-MM-yyyy");
             return updatedShift;
+        }
+
+        public async Task<string> GetNewName()
+        {
+            AnsiConsole.MarkupLine("[lightslateblue]What is the Name of the Worker[/]");
+            string Name = Console.ReadLine();
+            return Name;
+        }
+        public async Task<Worker> GetSelectWorker()
+        {
+            ResponseDto<List<Worker>> workers=await Workerrepository.GetAllWorker();
+            List<Worker> WorkerList=workers.Data;
+            List<string> WorkerNamesWithId = WorkerList.Select(x =>$"Name-{x.Name}:WorkerId-{x.WorkerId}").ToList();
+            var userChoice = AnsiConsole.Prompt(
+                   new SelectionPrompt<string>()
+                       .Title("Please select the Worker")
+                       .AddChoices(WorkerNamesWithId));
+            int SelectedId = int.Parse(userChoice.Split(":")[1].Split("-")[1]);
+            return WorkerList.FirstOrDefault(x => x.WorkerId == SelectedId);
         }
     }
 }

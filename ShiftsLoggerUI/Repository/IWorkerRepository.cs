@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ namespace ShiftsLoggerUI.Repository
     {
         public Task<ResponseDto<List<Worker>>> GetAllWorker();
         public Task<ResponseDto<List<Worker>>> GetSingleWorker(int Id);
-        public Task<ResponseDto<Worker>> CreateWorker(Worker NewsWorker);
+        public Task<ResponseDto<Worker>> CreateWorker(string NewWorker);
         public Task<ResponseDto<Worker>> DeleteWorker(int Id);
-        public Task<ResponseDto<Worker>> UpdateWorker(int Id, Worker worker);
+        public Task<ResponseDto<Worker>> UpdateWorker(Worker worker);
     }
     public class WorkerRepository : IWorkerRepository
     {
@@ -23,14 +24,40 @@ namespace ShiftsLoggerUI.Repository
         {
             client = _client;
         }
-        public async Task<ResponseDto<Worker>> CreateWorker(Worker NewsWorker)
+        public async Task<ResponseDto<Worker>> CreateWorker(string NewWorker)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient WorkerClient = client.GetClient();
+                string BaseUrl = client.GetBaseUrl() + "Worker";
+                var response =await WorkerClient.PostAsJsonAsync(BaseUrl, new Worker { Name=NewWorker });
+                Stream stream = await response.Content.ReadAsStreamAsync();
+                ResponseDto<Worker> ObjectResponse = await JsonSerializer.DeserializeAsync<ResponseDto<Worker>>(stream);
+                return ObjectResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
 
         public async Task<ResponseDto<Worker>> DeleteWorker(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient WorkerClient = client.GetClient();
+                string BaseUrl = client.GetBaseUrl() + $"Worker/{Id}";
+                var response = await WorkerClient.DeleteAsync(BaseUrl);
+                Stream stream = await response.Content.ReadAsStreamAsync();
+                ResponseDto<Worker> ObjectResponse = await JsonSerializer.DeserializeAsync<ResponseDto<Worker>>(stream);
+                return ObjectResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
 
         public async Task<ResponseDto<List<Worker>>> GetAllWorker()
@@ -54,12 +81,40 @@ namespace ShiftsLoggerUI.Repository
 
         public async Task<ResponseDto<List<Worker>>> GetSingleWorker(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient WorkerClient = client.GetClient();
+                string BaseUrl = client.GetBaseUrl()+$"Worker/{Id}";
+                using (Stream stream = await WorkerClient.GetStreamAsync(BaseUrl))
+                {
+                    ResponseDto<List<Worker>> WorkerResponse = await JsonSerializer.DeserializeAsync<ResponseDto<List<Worker>>>(stream);
+                    return WorkerResponse;
+                }                
+            }
+            catch(Exception e)
+            {
+                return new ResponseDto<List<Worker>> { Data = [],
+                Message=e.Message};
+            }
+            return null;
         }
 
-        public async Task<ResponseDto<Worker>> UpdateWorker(int Id, Worker worker)
+        public async Task<ResponseDto<Worker>> UpdateWorker(Worker worker)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient WorkerClient = client.GetClient();
+                string BaseUrl = client.GetBaseUrl() + "Worker";
+                var response = await WorkerClient.PutAsJsonAsync(BaseUrl, worker);
+                Stream stream = await response.Content.ReadAsStreamAsync();
+                ResponseDto<Worker> ObjectResponse = await JsonSerializer.DeserializeAsync<ResponseDto<Worker>>(stream);
+                return ObjectResponse;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
     }
 }
